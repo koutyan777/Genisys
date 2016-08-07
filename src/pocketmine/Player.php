@@ -172,6 +172,11 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	const ADVENTURE = 2;
 	const SPECTATOR = 3;
 	const VIEW = Player::SPECTATOR;
+	
+	const CRAFTING_SMALL = 0;
+	const CRAFTING_BIG = 1;
+	const CRAFTING_ANVIL = 2;
+	const CRAFTING_ENCHANT = 3;
 
 	/** @var SourceInterface */
 	protected $interface;
@@ -202,7 +207,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	public $achievements = [];
 	public $lastCorrect;
 
-	public $craftingType = 0; //0 = 2x2 crafting, 1 = 3x3 crafting, 2 = stonecutter
+	public $craftingType = self::CRAFTING_SMALL; //0 = 2x2 crafting, 1 = 3x3 crafting, 2 = anvil, 3 = enchanting
 
 	protected $isCrafting = false;
 
@@ -289,9 +294,6 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 	/** @var Item[] */
 	protected $personalCreativeItems = [];
-
-	/** @var Item */
-	private $anvilItem;
 
 	public function linkHookToPlayer(FishingHook $entity){
 		if($entity->isAlive()){
@@ -2503,7 +2505,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 				$blockVector = new Vector3($packet->x, $packet->y, $packet->z);
 
-				$this->craftingType = 0;
+				$this->craftingType = self::CRAFTING_SMALL;
 
 				if($packet->face >= 0 and $packet->face <= 5){ //Use Block, place
 					$this->setDataFlag(self::DATA_FLAGS, self::DATA_FLAG_ACTION, false);
@@ -2900,7 +2902,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 							break;
 						}
 
-						$this->craftingType = 0;
+						$this->craftingType = self::CRAFTING_SMALL;
 
 						if($this->server->netherEnabled){
 							if($this->level == $this->server->netherLevel){
@@ -2990,7 +2992,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				if($this->spawned === false or $this->blocked === true or !$this->isAlive()){
 					break;
 				}
-				$this->craftingType = 0;
+				$this->craftingType = self::CRAFTING_SMALL;
 
 				$vector = new Vector3($packet->x, $packet->y, $packet->z);
 
@@ -3029,7 +3031,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 					break;
 				}
 
-				$this->craftingType = 0;
+				$this->craftingType = self::CRAFTING_SMALL;
 
 				$target = $this->level->getEntity($packet->target);
 
@@ -3153,7 +3155,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				if($this->spawned === false or $this->blocked === true or !$this->isAlive()){
 					break;
 				}
-				$this->craftingType = 0;
+				$this->craftingType = self::CRAFTING_SMALL;
 
 				$this->setDataFlag(self::DATA_FLAGS, self::DATA_FLAG_ACTION, false); //TODO: check if this should be true
 
@@ -3185,7 +3187,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				if($this->spawned === false or !$this->isAlive()){
 					break;
 				}
-				$this->craftingType = 0;
+				$this->craftingType = self::CRAFTING_SMALL;
 				if($packet->type === TextPacket::TYPE_CHAT){
 					$packet->message = TextFormat::clean($packet->message, $this->removeFormat);
 					foreach(explode("\n", $packet->message) as $message){
@@ -3219,9 +3221,10 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				break;
 			case ProtocolInfo::CONTAINER_CLOSE_PACKET:
 				if($this->spawned === false or $packet->windowid === 0){
-					break;
+					echo "LOL\n";
+					//break;
 				}
-				$this->craftingType = 0;
+				$this->craftingType = self::CRAFTING_SMALL;
 				if(isset($this->windowIndex[$packet->windowid])){
 					$this->server->getPluginManager()->callEvent(new InventoryCloseEvent($this->windowIndex[$packet->windowid], $this));
 					$this->removeWindow($this->windowIndex[$packet->windowid]);
@@ -3555,7 +3558,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 				if($this->spawned === false or $this->blocked === true or !$this->isAlive()){
 					break;
 				}
-				$this->craftingType = 0;
+				$this->craftingType = self::CRAFTING_SMALL;
 
 				$pos = new Vector3($packet->x, $packet->y, $packet->z);
 				if($pos->distanceSquared($this) > 10000){
