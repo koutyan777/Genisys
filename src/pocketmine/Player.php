@@ -2106,11 +2106,11 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 
 	protected function processLogin(){
 		if(!$this->server->isWhitelisted(strtolower($this->getName()))){
-			$this->close($this->getLeaveMessage(), "Server is white-listed");
+			$this->close($this->getLeaveMessage(), "§eホワイトリスト(メンテナンス)§fにより、§bサーバー§fに§c入れません");
 
 			return;
 		}elseif($this->server->getNameBans()->isBanned(strtolower($this->getName())) or $this->server->getIPBans()->isBanned($this->getAddress()) or $this->server->getCIDBans()->isBanned($this->randomClientId)){
-			$this->close($this->getLeaveMessage(), TextFormat::RED . "You are banned");
+			$this->close($this->getLeaveMessage(), TextFormat::RED . "§cあなたはBANされました。解除希望はLobiのグループにて");
 
 			return;
 		}
